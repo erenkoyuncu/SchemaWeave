@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="560" viewBox="0 0 1400 560" role="img" aria-labelledby="title desc">
+  <title id="title">SchemaWeave</title>
+  <desc id="desc">Structured Data Engine for WordPress, WooCommerce and PHP</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f8fbff"/>
+      <stop offset="0.58" stop-color="#eef5ff"/>
+      <stop offset="1" stop-color="#f5efff"/>
+    </linearGradient>
+    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0ea5e9"/>
+      <stop offset="0.52" stop-color="#2563eb"/>
+      <stop offset="1" stop-color="#7c3aed"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#1d4ed8" flood-opacity="0.16"/>
+    </filter>
+  </defs>
+
+  <rect width="1400" height="560" rx="28" fill="url(#bg)"/>
+
+  <g opacity="0.35" stroke="#93c5fd" stroke-width="1.5">
+    <path d="M40 96h160M74 58v76M1190 62l170 90M1180 455l160-70M1010 520l90-70"/>
+    <circle cx="72" cy="96" r="4" fill="#60a5fa"/>
+    <circle cx="122" cy="96" r="4" fill="#60a5fa"/>
+    <circle cx="172" cy="96" r="4" fill="#60a5fa"/>
+    <circle cx="1280" cy="90" r="5" fill="#a78bfa"/>
+    <circle cx="1328" cy="118" r="4" fill="#60a5fa"/>
+    <circle cx="1230" cy="430" r="4" fill="#60a5fa"/>
+  </g>
+
+  <g transform="translate(70 92)">
+    <text x="0" y="112" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="86" font-weight="800" fill="#081a3a">Schema</text>
+    <text x="300" y="112" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="86" font-weight="800" fill="url(#brand)">Weave</text>
+    <text x="2" y="178" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="34" font-weight="500" fill="#253858">Structured Data Engine for WordPress &amp; PHP</text>
+    <text x="2" y="230" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="22" fill="#516176">Schema.org</text>
+    <circle cx="128" cy="223" r="5" fill="#2563eb"/>
+    <text x="147" y="230" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="22" fill="#516176">JSON-LD</text>
+    <circle cx="267" cy="223" r="5" fill="#2563eb"/>
+    <text x="286" y="230" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="22" fill="#516176">WordPress</text>
+    <circle cx="413" cy="223" r="5" fill="#7c3aed"/>
+    <text x="432" y="230" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="22" fill="#516176">WooCommerce</text>
+
+    <g transform="translate(0 286)">
+      <rect width="620" height="76" rx="18" fill="#ffffff" opacity="0.82" stroke="#dbeafe"/>
+      <text x="28" y="33" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="18" font-weight="700" fill="#172554">REAL DATA · CLEAN GRAPHS · OPEN SOURCE</text>
+      <text x="28" y="58" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="15" fill="#64748b">No fabricated prices, ratings, reviews, identifiers or offers.</text>
+    </g>
+  </g>
+
+  <g transform="translate(930 78)" filter="url(#shadow)">
+    <circle cx="190" cy="190" r="154" fill="#ffffff" opacity="0.72"/>
+    <g fill="none" stroke="url(#brand)" stroke-width="18" stroke-linecap="round">
+      <path d="M55 124C95 26 252 28 318 110C370 175 330 255 252 292C175 329 73 294 56 214C45 164 70 119 112 87"/>
+      <path d="M78 270C123 353 269 357 328 273C370 213 348 143 280 109C209 74 100 99 72 173C53 224 78 270 124 297"/>
+      <path d="M115 75C174 129 227 180 286 235"/>
+      <path d="M100 300C162 243 222 188 300 117"/>
+    </g>
+    <g fill="url(#brand)">
+      <circle cx="72" cy="126" r="22"/>
+      <circle cx="188" cy="41" r="24"/>
+      <circle cx="318" cy="110" r="20"/>
+      <circle cx="327" cy="277" r="22"/>
+      <circle cx="194" cy="347" r="22"/>
+      <circle cx="67" cy="270" r="20"/>
+    </g>
+    <text x="116" y="215" font-family="ui-monospace,SFMono-Regular,Consolas,monospace" font-size="58" font-weight="700" fill="#1d4ed8">{…}</text>
+  </g>
+
+  <text x="1160" y="515" text-anchor="middle" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="16" font-weight="700" letter-spacing="3" fill="#2563eb">STRUCTURED DATA. SEAMLESSLY.</text>
+</svg>
