@@ -17,8 +17,9 @@ jobs:
       - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-      - name: Verify bundled core checkout
-        run: test -f includes/SchemaWeave/SchemaEngine.php
+      - name: Verify core checkout
+        run: |
+          test -f includes/SchemaWeave/src/SchemaEngine.php || test -f includes/SchemaWeave/SchemaEngine.php
       - name: Lint PHP
         run: find . -name '*.php' -not -path './.git/*' -print0 | xargs -0 -n1 php -l
       - name: Validate plugin metadata
