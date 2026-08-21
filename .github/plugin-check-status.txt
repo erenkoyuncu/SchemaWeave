@@ -1,2 +1,2 @@
 WordPress Plugin Check
-outcome=failure
+outcome=success
