@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="branding/schemaweave-hero.svg" alt="SchemaWeave — Structured Data Engine for WordPress & PHP" width="100%">
+  <img src="branding/banner-1544x500.jpg" alt="SchemaWeave — Structured Data Engine for WordPress & PHP" width="100%">
 </p>
 
 <h1 align="center">SchemaWeave</h1>
