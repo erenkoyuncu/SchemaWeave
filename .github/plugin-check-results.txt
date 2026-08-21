@@ -1,3 +1,1 @@
-FILE: includes/class-tools.php
-[{"line":105,"column":48,"type":"WARNING","code":"WordPress.Security.NonceVerification.Recommended","message":"Processing form data without nonce verification.","docs":""}]
-
+Success: Checks complete. No errors found.
