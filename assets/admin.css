@@ -1,0 +1,280 @@
+.schemaweave-admin {
+    max-width: 1120px;
+}
+
+.schemaweave-hero {
+    display: flex;
+    justify-content: space-between;
+    gap: 24px;
+    align-items: flex-start;
+    padding: 28px 30px;
+    margin: 22px 0 20px;
+    background: #fff;
+    border: 1px solid #dcdcde;
+    border-radius: 12px;
+}
+
+.schemaweave-hero h1 {
+    margin: 2px 0 8px;
+    font-size: 30px;
+    line-height: 1.15;
+}
+
+.schemaweave-hero p {
+    margin: 0;
+    max-width: 760px;
+    color: #50575e;
+}
+
+.schemaweave-eyebrow {
+    color: #2271b1 !important;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.schemaweave-version {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    padding: 6px 10px;
+    background: #f0f6fc;
+    color: #135e96;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.schemaweave-card {
+    background: #fff;
+    border: 1px solid #dcdcde;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 18px;
+}
+
+.schemaweave-card-heading {
+    margin-bottom: 20px;
+}
+
+.schemaweave-card-heading-inline {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.schemaweave-card h2 {
+    margin: 0 0 5px;
+    font-size: 18px;
+}
+
+.schemaweave-card-heading p,
+.schemaweave-integrity-card p {
+    margin: 0;
+    color: #646970;
+}
+
+.schemaweave-grid {
+    display: grid;
+    gap: 16px;
+}
+
+.schemaweave-grid-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.schemaweave-span-2 {
+    grid-column: span 2;
+}
+
+.schemaweave-field {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.schemaweave-field > span {
+    font-weight: 600;
+}
+
+.schemaweave-field input,
+.schemaweave-field select,
+.schemaweave-field textarea,
+.schemaweave-mapping-row select {
+    width: 100%;
+    max-width: none;
+}
+
+.schemaweave-toggle-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 14px 16px;
+    border: 1px solid #e2e4e7;
+    border-radius: 9px;
+    background: #fafafa;
+}
+
+.schemaweave-toggle-row input {
+    margin-top: 3px;
+}
+
+.schemaweave-toggle-row span {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.schemaweave-toggle-row small {
+    color: #646970;
+}
+
+.schemaweave-checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.schemaweave-check {
+    display: flex;
+    gap: 9px;
+    align-items: center;
+    padding: 11px 12px;
+    border: 1px solid #e2e4e7;
+    border-radius: 8px;
+}
+
+.schemaweave-location {
+    padding: 18px;
+    margin-bottom: 14px;
+    border: 1px solid #dcdcde;
+    border-radius: 10px;
+    background: #fbfbfc;
+}
+
+.schemaweave-location-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 15px;
+}
+
+.schemaweave-mapping-list,
+.schemaweave-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.schemaweave-mapping-row {
+    display: grid;
+    grid-template-columns: 1fr 260px;
+    gap: 18px;
+    align-items: center;
+    padding: 12px 14px;
+    border: 1px solid #e2e4e7;
+    border-radius: 8px;
+}
+
+.schemaweave-mapping-row > div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.schemaweave-mapping-row code {
+    width: fit-content;
+}
+
+.schemaweave-integrity-card {
+    border-left: 4px solid #00a32a;
+}
+
+@media (max-width: 782px) {
+    .schemaweave-grid-2,
+    .schemaweave-checkbox-grid,
+    .schemaweave-mapping-row {
+        grid-template-columns: 1fr;
+    }
+
+    .schemaweave-span-2 {
+        grid-column: span 1;
+    }
+
+    .schemaweave-hero,
+    .schemaweave-card-heading-inline {
+        flex-direction: column;
+    }
+}
+
+.schemaweave-tools-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.schemaweave-tool-panel {
+    border: 1px solid #dcdcde;
+    border-radius: 8px;
+    padding: 16px;
+    background: #fff;
+}
+
+.schemaweave-tool-panel h3 {
+    margin-top: 0;
+}
+
+.schemaweave-tool-panel form {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.schemaweave-tool-danger {
+    border-color: #d63638;
+}
+
+.schemaweave-diagnostics-table th {
+    width: 220px;
+}
+
+.schemaweave-diagnostic-list {
+    margin: 16px 0;
+    padding-left: 22px;
+    list-style: disc;
+}
+
+.schemaweave-inspector-form {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.schemaweave-inspector-form select {
+    min-width: 360px;
+    max-width: 100%;
+}
+
+.schemaweave-diagnostics-json {
+    min-height: 420px;
+    white-space: pre;
+}
+
+@media (max-width: 960px) {
+    .schemaweave-tools-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .schemaweave-inspector-form {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .schemaweave-inspector-form select {
+        min-width: 0;
+        width: 100%;
+    }
+}

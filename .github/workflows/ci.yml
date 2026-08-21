@@ -1,0 +1,28 @@
+name: WordPress Plugin CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: ['7.4', '8.1', '8.4']
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+      - name: Verify bundled core checkout
+        run: test -f includes/SchemaWeave/SchemaEngine.php
+      - name: Lint PHP
+        run: find . -name '*.php' -not -path './.git/*' -print0 | xargs -0 -n1 php -l
+      - name: Validate plugin metadata
+        run: |
+          grep -q 'Version: 1.0.0' schemaweave.php
+          grep -q 'Stable tag: 1.0.0' readme.txt
+          grep -q 'License: GPLv2 or later' schemaweave.php

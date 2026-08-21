@@ -1,0 +1,3 @@
+[submodule "includes/SchemaWeave"]
+	path = includes/SchemaWeave
+	url = https://github.com/erenkoyuncu/SchemaWeave-PHP.git

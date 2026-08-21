@@ -1,0 +1,8 @@
+.schemaweave-faq { margin-block: 2rem; }
+.schemaweave-faq__title { margin-bottom: 1rem; }
+.schemaweave-faq__items { display: grid; gap: .75rem; }
+.schemaweave-faq__item { border: 1px solid currentColor; border-color: color-mix(in srgb, currentColor 18%, transparent); border-radius: .5rem; padding: .75rem 1rem; }
+.schemaweave-faq__question { cursor: pointer; font-weight: 600; }
+.schemaweave-faq__answer { padding-top: .75rem; }
+.schemaweave-faq__answer > :first-child { margin-top: 0; }
+.schemaweave-faq__answer > :last-child { margin-bottom: 0; }

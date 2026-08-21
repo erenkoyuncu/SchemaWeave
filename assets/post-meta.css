@@ -1,0 +1,133 @@
+.schemaweave-editor {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.schemaweave-editor-head,
+.schemaweave-editor-section-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+}
+
+.schemaweave-editor-head p,
+.schemaweave-editor-section-head p {
+    margin: 4px 0 0;
+    color: #646970;
+}
+
+.schemaweave-editor-toggle {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 13px 14px;
+    border: 1px solid #dcdcde;
+    border-radius: 8px;
+    background: #f6f7f7;
+}
+
+.schemaweave-editor-toggle input {
+    margin-top: 3px;
+}
+
+.schemaweave-editor-toggle span {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.schemaweave-editor-toggle small {
+    color: #646970;
+}
+
+.schemaweave-editor-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.schemaweave-editor-span-2 {
+    grid-column: span 2;
+}
+
+.schemaweave-editor-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.schemaweave-editor-field > span {
+    font-weight: 600;
+}
+
+.schemaweave-editor-field input,
+.schemaweave-editor-field select,
+.schemaweave-editor-field textarea {
+    width: 100%;
+    max-width: none;
+}
+
+.schemaweave-media-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    gap: 8px;
+    align-items: center;
+}
+
+.schemaweave-faq-wrap,
+.schemaweave-preview {
+    padding-top: 16px;
+    border-top: 1px solid #dcdcde;
+}
+
+.schemaweave-faq-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 14px;
+    align-items: start;
+    margin-top: 12px;
+    padding: 14px;
+    border: 1px solid #dcdcde;
+    border-radius: 8px;
+    background: #fbfbfc;
+}
+
+.schemaweave-faq-fields {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
+    gap: 12px;
+}
+
+.schemaweave-preview pre {
+    max-height: 440px;
+    overflow: auto;
+    padding: 15px;
+    margin: 12px 0 0;
+    border: 1px solid #dcdcde;
+    border-radius: 8px;
+    background: #101517;
+    color: #d7e2e7;
+    white-space: pre-wrap;
+    word-break: break-word;
+    tab-size: 2;
+}
+
+@media (max-width: 782px) {
+    .schemaweave-editor-grid,
+    .schemaweave-faq-fields,
+    .schemaweave-faq-row,
+    .schemaweave-media-row {
+        grid-template-columns: 1fr;
+    }
+
+    .schemaweave-editor-span-2 {
+        grid-column: span 1;
+    }
+
+    .schemaweave-editor-head,
+    .schemaweave-editor-section-head {
+        flex-direction: column;
+    }
+}
