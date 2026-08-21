@@ -3,7 +3,7 @@
  * Plugin Name: SchemaWeave
  * Plugin URI: https://github.com/erenkoyuncu/SchemaWeave
  * Description: Schema.org JSON-LD generation for WordPress using a framework-agnostic PHP core.
- * Version: 1.0.0
+ * Version: 1.0.1
  * Requires at least: 5.8
  * Requires PHP: 7.4
  * Author: Eren Koyuncu
@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('SCHEMAWEAVE_VERSION', '1.0.0');
+define('SCHEMAWEAVE_VERSION', '1.0.1');
 define('SCHEMAWEAVE_DIR', plugin_dir_path(__FILE__));
 define('SCHEMAWEAVE_URL', plugin_dir_url(__FILE__));
 

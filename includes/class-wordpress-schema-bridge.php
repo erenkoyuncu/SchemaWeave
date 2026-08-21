@@ -39,7 +39,7 @@ final class SchemaWeave_WordPress_Schema_Bridge
             return;
         }
 
-        echo "\n<script type=\"application/ld+json\">" . $json . "</script>\n";
+        wp_print_inline_script_tag($json, ['type' => 'application/ld+json']);
     }
 
     public static function buildDocumentForPost(int $postId, ?array $overrides = null): array

@@ -2,9 +2,9 @@
 Contributors: erenkoyuncu
 Tags: schema, json-ld, schema.org, seo, woocommerce
 Requires at least: 5.8
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -60,6 +60,10 @@ No. SchemaWeave generates structured data; search engines apply their own eligib
 SchemaWeave does not transmit site content, product data, settings or diagnostics to the project maintainers or to a SchemaWeave service.
 
 == Changelog ==
+
+= 1.0.1 =
+* Improved WordPress.org Plugin Check compliance for output, request validation, uninstall cleanup and translations.
+* Updated Tested up to for WordPress 7.1.
 
 = 1.0.0 =
 * First stable release.

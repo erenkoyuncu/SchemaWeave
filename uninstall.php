@@ -3,26 +3,25 @@ if (!defined('WP_UNINSTALL_PLUGIN')) {
     exit;
 }
 
-$optionName = 'schemaweave_settings';
-$settings = get_option($optionName, []);
-$deleteData = is_array($settings)
-    && !empty($settings['advanced'])
-    && is_array($settings['advanced'])
-    && !empty($settings['advanced']['delete_data_on_uninstall']);
+$schemaweave_option_name = 'schemaweave_settings';
+$schemaweave_settings = get_option($schemaweave_option_name, []);
+$schemaweave_delete_data = is_array($schemaweave_settings)
+    && !empty($schemaweave_settings['advanced'])
+    && is_array($schemaweave_settings['advanced'])
+    && !empty($schemaweave_settings['advanced']['delete_data_on_uninstall']);
 
-if (!$deleteData) {
+if (!$schemaweave_delete_data) {
     return;
 }
 
-delete_option($optionName);
+delete_option($schemaweave_option_name);
 delete_option('schemaweave_db_version');
 
 if (is_multisite()) {
     delete_site_option('schemaweave_db_version');
 }
 
-global $wpdb;
-$metaKeys = [
+$schemaweave_meta_keys = [
     '_schemaweave_disabled',
     '_schemaweave_type_override',
     '_schemaweave_page_type_override',
@@ -32,6 +31,6 @@ $metaKeys = [
     '_schemaweave_faq',
 ];
 
-foreach ($metaKeys as $metaKey) {
-    $wpdb->delete($wpdb->postmeta, ['meta_key' => $metaKey], ['%s']);
+foreach ($schemaweave_meta_keys as $schemaweave_meta_key) {
+    delete_post_meta_by_key($schemaweave_meta_key);
 }

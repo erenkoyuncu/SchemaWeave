@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.1 - 2026-08-21
+
+- Improved WordPress.org Plugin Check compliance.
+- Hardened request validation and output handling without changing schema behavior.
+- Updated WordPress compatibility metadata for 7.1.
+- Replaced direct postmeta cleanup queries with the WordPress metadata API.
+
 ## 1.0.0 - 2026-08-20
 
 - First stable WordPress release.

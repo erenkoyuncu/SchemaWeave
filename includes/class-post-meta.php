@@ -97,7 +97,10 @@ final class SchemaWeave_WordPress_Post_Meta
             <div class="schemaweave-editor-head">
                 <div>
                     <strong><?php esc_html_e('Structured data controls', 'schemaweave'); ?></strong>
-                    <p><?php echo esc_html(sprintf(__('Global mapping: %s. Use overrides only when this content needs different schema behavior.', 'schemaweave'), $mapping)); ?></p>
+                    <p><?php
+                    /* translators: %s: current global SchemaWeave mapping label. */
+                    echo esc_html(sprintf(__('Global mapping: %s. Use overrides only when this content needs different schema behavior.', 'schemaweave'), $mapping));
+                    ?></p>
                 </div>
                 <button type="button" class="button button-secondary" data-schemaweave-preview><?php esc_html_e('Preview JSON-LD', 'schemaweave'); ?></button>
             </div>
@@ -203,9 +206,11 @@ final class SchemaWeave_WordPress_Post_Meta
             return;
         }
 
-        $raw = isset($_POST['schemaweave_meta']) && is_array($_POST['schemaweave_meta'])
-            ? wp_unslash($_POST['schemaweave_meta'])
-            : [];
+        $raw = [];
+        if (isset($_POST['schemaweave_meta']) && is_array($_POST['schemaweave_meta'])) {
+            // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized field-by-field by sanitizePayload() before persistence.
+            $raw = wp_unslash($_POST['schemaweave_meta']);
+        }
 
         self::persist($postId, self::sanitizePayload($raw));
     }
@@ -219,6 +224,7 @@ final class SchemaWeave_WordPress_Post_Meta
             wp_send_json_error(['message' => __('You are not allowed to preview this content.', 'schemaweave')], 403);
         }
 
+        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- JSON is decoded and sanitized field-by-field by sanitizePayload().
         $rawJson = isset($_POST['meta']) ? (string) wp_unslash($_POST['meta']) : '{}';
         $decoded = json_decode($rawJson, true);
         $payload = self::sanitizePayload(is_array($decoded) ? $decoded : []);

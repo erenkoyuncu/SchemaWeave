@@ -27,7 +27,11 @@ final class SchemaWeave_WordPress_Diagnostics
 
         $settings = SchemaWeave_WordPress_Settings::get();
         $overlaps = self::potentialOverlapPlugins();
-        $inspectPostId = isset($_GET['inspect_post']) ? absint($_GET['inspect_post']) : 0;
+        $inspectPostId = 0;
+        if (isset($_GET['inspect_post'])) {
+            check_admin_referer('schemaweave_inspect');
+            $inspectPostId = absint($_GET['inspect_post']);
+        }
         $document = $inspectPostId > 0
             ? SchemaWeave_WordPress_Schema_Bridge::buildDocumentForPost($inspectPostId)
             : [];
@@ -94,6 +98,7 @@ final class SchemaWeave_WordPress_Diagnostics
 
                 <form method="get" action="<?php echo esc_url(admin_url('options-general.php')); ?>" class="schemaweave-inspector-form">
                     <input type="hidden" name="page" value="<?php echo esc_attr(self::PAGE_SLUG); ?>">
+                    <?php wp_nonce_field('schemaweave_inspect'); ?>
                     <select name="inspect_post">
                         <option value="0"><?php esc_html_e('Select content…', 'schemaweave'); ?></option>
                         <?php foreach ($posts as $post) { ?>

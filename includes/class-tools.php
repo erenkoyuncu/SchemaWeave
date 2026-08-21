@@ -15,7 +15,8 @@ final class SchemaWeave_WordPress_Tools
 
     public static function export(): void
     {
-        self::authorize(self::EXPORT_ACTION);
+        self::authorize();
+        check_admin_referer(self::EXPORT_ACTION);
 
         $payload = [
             'format' => 'schemaweave-settings',
@@ -24,40 +25,41 @@ final class SchemaWeave_WordPress_Tools
             'settings' => SchemaWeave_WordPress_Settings::get(),
         ];
 
-        $json = wp_json_encode(
+        nocache_headers();
+        header('Content-Disposition: attachment; filename="schemaweave-settings-' . gmdate('Y-m-d') . '.json"');
+        wp_send_json(
             $payload,
+            200,
             JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
         );
-
-        if ($json === false) {
-            wp_die(esc_html__('Could not encode SchemaWeave settings.', 'schemaweave'));
-        }
-
-        nocache_headers();
-        header('Content-Type: application/json; charset=utf-8');
-        header('Content-Disposition: attachment; filename="schemaweave-settings-' . gmdate('Y-m-d') . '.json"');
-        echo $json;
-        exit;
     }
 
     public static function import(): void
     {
-        self::authorize(self::IMPORT_ACTION);
+        self::authorize();
+        check_admin_referer(self::IMPORT_ACTION);
 
-        if (
-            empty($_FILES['schemaweave_settings_file'])
-            || !is_array($_FILES['schemaweave_settings_file'])
-            || (int) ($_FILES['schemaweave_settings_file']['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK
-        ) {
+        if (empty($_FILES['schemaweave_settings_file']) || !is_array($_FILES['schemaweave_settings_file'])) {
             self::redirect('import-error');
         }
 
-        $tmp = (string) ($_FILES['schemaweave_settings_file']['tmp_name'] ?? '');
+        $error = isset($_FILES['schemaweave_settings_file']['error'])
+            ? absint($_FILES['schemaweave_settings_file']['error'])
+            : UPLOAD_ERR_NO_FILE;
+        if ($error !== UPLOAD_ERR_OK) {
+            self::redirect('import-error');
+        }
+
+        $tmp = isset($_FILES['schemaweave_settings_file']['tmp_name'])
+            ? sanitize_text_field((string) wp_unslash($_FILES['schemaweave_settings_file']['tmp_name']))
+            : '';
         if ($tmp === '' || !is_uploaded_file($tmp)) {
             self::redirect('import-error');
         }
 
-        $size = (int) ($_FILES['schemaweave_settings_file']['size'] ?? 0);
+        $size = isset($_FILES['schemaweave_settings_file']['size'])
+            ? absint($_FILES['schemaweave_settings_file']['size'])
+            : 0;
         if ($size <= 0 || $size > 1024 * 1024) {
             self::redirect('import-size');
         }
@@ -86,7 +88,8 @@ final class SchemaWeave_WordPress_Tools
 
     public static function reset(): void
     {
-        self::authorize(self::RESET_ACTION);
+        self::authorize();
+        check_admin_referer(self::RESET_ACTION);
         update_option(SchemaWeave_WordPress_Settings::OPTION, SchemaWeave_WordPress_Settings::defaults());
         self::redirect('reset');
     }
@@ -97,6 +100,7 @@ final class SchemaWeave_WordPress_Tools
             return;
         }
 
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only status code used only to choose an admin notice.
         $status = isset($_GET['schemaweave_status'])
             ? sanitize_key((string) wp_unslash($_GET['schemaweave_status']))
             : '';
@@ -165,13 +169,11 @@ final class SchemaWeave_WordPress_Tools
         <?php
     }
 
-    private static function authorize(string $action): void
+    private static function authorize(): void
     {
         if (!current_user_can('manage_options')) {
             wp_die(esc_html__('You are not allowed to manage SchemaWeave settings.', 'schemaweave'));
         }
-
-        check_admin_referer($action);
     }
 
     private static function redirect(string $status): void
