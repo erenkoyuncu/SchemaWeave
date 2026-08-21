@@ -91,18 +91,39 @@ jobs:
       - name: Create GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
-          TARGET_SHA: ${{ github.event.before }}
+          TARGET_SHA: cfa4ef89787fbadf6e24cfea61b242ebb6d39484
         shell: bash
         run: |
           set -euo pipefail
-          if gh release view v1.0.0 >/dev/null 2>&1; then
+          if gh release view v1.0.0 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo 'Release v1.0.0 already exists.'
-            exit 0
+          else
+            gh release create v1.0.0 \
+              dist/schemaweave-1.0.0.zip \
+              dist/SHA256SUMS.txt \
+              --repo "$GITHUB_REPOSITORY" \
+              --target "$TARGET_SHA" \
+              --title 'SchemaWeave v1.0.0' \
+              --notes-file dist/RELEASE_NOTES.md
           fi
-          gh release create v1.0.0 \
-            dist/schemaweave-1.0.0.zip \
-            dist/SHA256SUMS.txt \
-            --repo "$GITHUB_REPOSITORY" \
-            --target "$TARGET_SHA" \
-            --title 'SchemaWeave v1.0.0' \
-            --notes-file dist/RELEASE_NOTES.md
+
+      - name: Verify published release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          RELEASE_URL="$(gh release view v1.0.0 --repo "$GITHUB_REPOSITORY" --json url --jq .url)"
+          printf 'SchemaWeave v1.0.0 published\n%s\n' "$RELEASE_URL" > /tmp/release-status.txt
+          CONTENT="$(base64 -w0 /tmp/release-status.txt)"
+          EXISTING_SHA="$(gh api "repos/$GITHUB_REPOSITORY/contents/.github/release-status-v1.0.0.txt" --jq .sha 2>/dev/null || true)"
+          if [ -n "$EXISTING_SHA" ]; then
+            gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/.github/release-status-v1.0.0.txt" \
+              -f message='Record SchemaWeave v1.0.0 release status' \
+              -f content="$CONTENT" \
+              -f sha="$EXISTING_SHA" >/dev/null
+          else
+            gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/.github/release-status-v1.0.0.txt" \
+              -f message='Record SchemaWeave v1.0.0 release status' \
+              -f content="$CONTENT" >/dev/null
+          fi
