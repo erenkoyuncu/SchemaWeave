@@ -1,2 +1,0 @@
-SchemaWeave v1.0.0 published
-https://github.com/erenkoyuncu/SchemaWeave/releases/tag/v1.0.0
