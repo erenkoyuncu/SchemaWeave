@@ -1,0 +1,46 @@
+name: WordPress Plugin Check
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/plugin-check.yml'
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  plugin-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Build WordPress.org submission directory
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf build
+          mkdir -p build/schemaweave/includes/SchemaWeave
+
+          cp schemaweave.php build/schemaweave/
+          cp uninstall.php build/schemaweave/
+          cp readme.txt build/schemaweave/
+          cp LICENSE build/schemaweave/
+          cp CHANGELOG.md build/schemaweave/
+          cp PRIVACY.md build/schemaweave/
+          cp -R assets build/schemaweave/assets
+          cp -R docs build/schemaweave/docs
+
+          rsync -a --exclude='SchemaWeave' includes/ build/schemaweave/includes/
+          cp -R includes/SchemaWeave/src/. build/schemaweave/includes/SchemaWeave/
+          cp includes/SchemaWeave/LICENSE build/schemaweave/includes/SchemaWeave/LICENSE
+
+      - name: Run official Plugin Check
+        uses: wordpress/plugin-check-action@v1
+        with:
+          build-dir: './build/schemaweave'
+          slug: 'schemaweave'
