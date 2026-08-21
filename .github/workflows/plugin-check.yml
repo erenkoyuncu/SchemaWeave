@@ -4,6 +4,13 @@ on:
   push:
     branches: [main]
     paths:
+      - 'schemaweave.php'
+      - 'uninstall.php'
+      - 'readme.txt'
+      - 'CHANGELOG.md'
+      - 'includes/**'
+      - 'assets/**'
+      - 'docs/**'
       - '.github/workflows/plugin-check.yml'
   pull_request:
 
@@ -31,7 +38,6 @@ jobs:
           cp readme.txt build/schemaweave/
           cp LICENSE build/schemaweave/
           cp CHANGELOG.md build/schemaweave/
-          cp PRIVACY.md build/schemaweave/
           cp -R assets build/schemaweave/assets
           cp -R docs build/schemaweave/docs
 
