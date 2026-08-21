@@ -1,0 +1,171 @@
+name: Apply SchemaWeave v1.0.1 compliance patch
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/apply-v1.0.1-compliance.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Apply compliance patch
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git -C includes/SchemaWeave fetch origin 7b99536b2c56d7c194f865da01dc11e237afd83c
+          git -C includes/SchemaWeave checkout 7b99536b2c56d7c194f865da01dc11e237afd83c
+
+          python3 <<'PY'
+          from pathlib import Path
+
+          def replace(path, old, new):
+              p = Path(path)
+              text = p.read_text()
+              if old not in text:
+                  raise SystemExit(f'Expected source block not found in {path}: {old[:80]!r}')
+              p.write_text(text.replace(old, new, 1))
+
+          replace('schemaweave.php', ' * Version: 1.0.0', ' * Version: 1.0.1')
+          replace("schemaweave.php", "define('SCHEMAWEAVE_VERSION', '1.0.0');", "define('SCHEMAWEAVE_VERSION', '1.0.1');")
+
+          replace('readme.txt', 'Tested up to: 7.0', 'Tested up to: 7.1')
+          replace('readme.txt', 'Stable tag: 1.0.0', 'Stable tag: 1.0.1')
+          replace(
+              'readme.txt',
+              '== Changelog ==\n\n= 1.0.0 =',
+              '== Changelog ==\n\n= 1.0.1 =\n* Improved WordPress.org Plugin Check compliance for output, request validation, uninstall cleanup and translations.\n* Updated Tested up to for WordPress 7.1.\n\n= 1.0.0 ='
+          )
+
+          replace(
+              'CHANGELOG.md',
+              '# Changelog\n\n## 1.0.0 - 2026-08-20',
+              '# Changelog\n\n## 1.0.1 - 2026-08-21\n\n- Improved WordPress.org Plugin Check compliance.\n- Hardened request validation and output handling without changing schema behavior.\n- Updated WordPress compatibility metadata for 7.1.\n- Replaced direct postmeta cleanup queries with the WordPress metadata API.\n\n## 1.0.0 - 2026-08-20'
+          )
+
+          replace(
+              'includes/class-post-meta.php',
+              "                    <p><?php echo esc_html(sprintf(__('Global mapping: %s. Use overrides only when this content needs different schema behavior.', 'schemaweave'), $mapping)); ?></p>",
+              "                    <p><?php\n                    /* translators: %s: current global SchemaWeave mapping label. */\n                    echo esc_html(sprintf(__('Global mapping: %s. Use overrides only when this content needs different schema behavior.', 'schemaweave'), $mapping));\n                    ?></p>"
+          )
+          replace(
+              'includes/class-post-meta.php',
+              "        $raw = isset($_POST['schemaweave_meta']) && is_array($_POST['schemaweave_meta'])\n            ? wp_unslash($_POST['schemaweave_meta'])\n            : [];",
+              "        $raw = [];\n        if (isset($_POST['schemaweave_meta']) && is_array($_POST['schemaweave_meta'])) {\n            // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized field-by-field by sanitizePayload() before persistence.\n            $raw = wp_unslash($_POST['schemaweave_meta']);\n        }"
+          )
+          replace(
+              'includes/class-post-meta.php',
+              "        $rawJson = isset($_POST['meta']) ? (string) wp_unslash($_POST['meta']) : '{}';",
+              "        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- JSON is decoded and sanitized field-by-field by sanitizePayload().\n        $rawJson = isset($_POST['meta']) ? (string) wp_unslash($_POST['meta']) : '{}';"
+          )
+
+          replace('includes/class-tools.php', '        self::authorize(self::EXPORT_ACTION);', '        self::authorize();\n        check_admin_referer(self::EXPORT_ACTION);')
+          replace(
+              'includes/class-tools.php',
+              "        $json = wp_json_encode(\n            $payload,\n            JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES\n        );\n\n        if ($json === false) {\n            wp_die(esc_html__('Could not encode SchemaWeave settings.', 'schemaweave'));\n        }\n\n        nocache_headers();\n        header('Content-Type: application/json; charset=utf-8');\n        header('Content-Disposition: attachment; filename=\"schemaweave-settings-' . gmdate('Y-m-d') . '.json\"');\n        echo $json;\n        exit;",
+              "        nocache_headers();\n        header('Content-Disposition: attachment; filename=\"schemaweave-settings-' . gmdate('Y-m-d') . '.json\"');\n        wp_send_json(\n            $payload,\n            200,\n            JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES\n        );"
+          )
+          replace('includes/class-tools.php', '        self::authorize(self::IMPORT_ACTION);', '        self::authorize();\n        check_admin_referer(self::IMPORT_ACTION);')
+          replace(
+              'includes/class-tools.php',
+              "        if (\n            empty($_FILES['schemaweave_settings_file'])\n            || !is_array($_FILES['schemaweave_settings_file'])\n            || (int) ($_FILES['schemaweave_settings_file']['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK\n        ) {\n            self::redirect('import-error');\n        }\n\n        $tmp = (string) ($_FILES['schemaweave_settings_file']['tmp_name'] ?? '');",
+              "        if (empty($_FILES['schemaweave_settings_file']) || !is_array($_FILES['schemaweave_settings_file'])) {\n            self::redirect('import-error');\n        }\n\n        $error = isset($_FILES['schemaweave_settings_file']['error'])\n            ? absint($_FILES['schemaweave_settings_file']['error'])\n            : UPLOAD_ERR_NO_FILE;\n        if ($error !== UPLOAD_ERR_OK) {\n            self::redirect('import-error');\n        }\n\n        $tmp = isset($_FILES['schemaweave_settings_file']['tmp_name'])\n            ? sanitize_text_field((string) wp_unslash($_FILES['schemaweave_settings_file']['tmp_name']))\n            : '';"
+          )
+          replace(
+              'includes/class-tools.php',
+              "        $size = (int) ($_FILES['schemaweave_settings_file']['size'] ?? 0);",
+              "        $size = isset($_FILES['schemaweave_settings_file']['size'])\n            ? absint($_FILES['schemaweave_settings_file']['size'])\n            : 0;"
+          )
+          replace('includes/class-tools.php', '        self::authorize(self::RESET_ACTION);', '        self::authorize();\n        check_admin_referer(self::RESET_ACTION);')
+          replace(
+              'includes/class-tools.php',
+              "        $status = isset($_GET['schemaweave_status'])",
+              "        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only status code used only to choose an admin notice.\n        $status = isset($_GET['schemaweave_status'])"
+          )
+          replace(
+              'includes/class-tools.php',
+              "    private static function authorize(string $action): void\n    {\n        if (!current_user_can('manage_options')) {\n            wp_die(esc_html__('You are not allowed to manage SchemaWeave settings.', 'schemaweave'));\n        }\n\n        check_admin_referer($action);\n    }",
+              "    private static function authorize(): void\n    {\n        if (!current_user_can('manage_options')) {\n            wp_die(esc_html__('You are not allowed to manage SchemaWeave settings.', 'schemaweave'));\n        }\n    }"
+          )
+
+          replace(
+              'includes/class-wordpress-schema-bridge.php',
+              '        echo "\\n<script type=\\"application/ld+json\\">" . $json . "</script>\\n";',
+              "        wp_print_inline_script_tag($json, ['type' => 'application/ld+json']);"
+          )
+
+          replace(
+              'includes/class-diagnostics.php',
+              "        $inspectPostId = isset($_GET['inspect_post']) ? absint($_GET['inspect_post']) : 0;",
+              "        $inspectPostId = 0;\n        if (isset($_GET['inspect_post'])) {\n            check_admin_referer('schemaweave_inspect');\n            $inspectPostId = absint($_GET['inspect_post']);\n        }"
+          )
+          replace(
+              'includes/class-diagnostics.php',
+              '                    <input type="hidden" name="page" value="<?php echo esc_attr(self::PAGE_SLUG); ?>">',
+              '                    <input type="hidden" name="page" value="<?php echo esc_attr(self::PAGE_SLUG); ?>">\n                    <?php wp_nonce_field(\'schemaweave_inspect\'); ?>'
+          )
+
+          Path('uninstall.php').write_text("""<?php
+          if (!defined('WP_UNINSTALL_PLUGIN')) {
+              exit;
+          }
+
+          $schemaweave_option_name = 'schemaweave_settings';
+          $schemaweave_settings = get_option($schemaweave_option_name, []);
+          $schemaweave_delete_data = is_array($schemaweave_settings)
+              && !empty($schemaweave_settings['advanced'])
+              && is_array($schemaweave_settings['advanced'])
+              && !empty($schemaweave_settings['advanced']['delete_data_on_uninstall']);
+
+          if (!$schemaweave_delete_data) {
+              return;
+          }
+
+          delete_option($schemaweave_option_name);
+          delete_option('schemaweave_db_version');
+
+          if (is_multisite()) {
+              delete_site_option('schemaweave_db_version');
+          }
+
+          $schemaweave_meta_keys = [
+              '_schemaweave_disabled',
+              '_schemaweave_type_override',
+              '_schemaweave_page_type_override',
+              '_schemaweave_image',
+              '_schemaweave_brand',
+              '_schemaweave_description',
+              '_schemaweave_faq',
+          ];
+
+          foreach ($schemaweave_meta_keys as $schemaweave_meta_key) {
+              delete_post_meta_by_key($schemaweave_meta_key);
+          }
+          """.replace('\n          ', '\n').lstrip())
+          PY
+
+          find . -name '*.php' -not -path './.git/*' -not -path './includes/SchemaWeave/.git/*' -print0 | xargs -0 -n1 php -l
+          grep -q 'Version: 1.0.1' schemaweave.php
+          grep -q 'Stable tag: 1.0.1' readme.txt
+          grep -q 'Tested up to: 7.1' readme.txt
+
+      - name: Commit patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add schemaweave.php readme.txt CHANGELOG.md uninstall.php includes/class-post-meta.php includes/class-tools.php includes/class-wordpress-schema-bridge.php includes/class-diagnostics.php includes/SchemaWeave
+          git commit -m 'Prepare SchemaWeave v1.0.1 for WordPress.org' || exit 0
+          git push origin HEAD:main
