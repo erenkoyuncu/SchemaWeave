@@ -100,10 +100,12 @@ final class SchemaWeave_WordPress_Tools
             return;
         }
 
-        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only status code used only to choose an admin notice.
-        $status = isset($_GET['schemaweave_status'])
-            ? sanitize_key((string) wp_unslash($_GET['schemaweave_status']))
-            : '';
+        if (!isset($_GET['schemaweave_status'])) {
+            return;
+        }
+
+        check_admin_referer('schemaweave_status');
+        $status = sanitize_key((string) wp_unslash($_GET['schemaweave_status']));
 
         $messages = [
             'imported' => ['success', __('SchemaWeave settings imported successfully.', 'schemaweave')],
@@ -178,13 +180,15 @@ final class SchemaWeave_WordPress_Tools
 
     private static function redirect(string $status): void
     {
-        wp_safe_redirect(add_query_arg(
+        $url = add_query_arg(
             [
                 'page' => SchemaWeave_WordPress_Settings::PAGE_SLUG,
                 'schemaweave_status' => $status,
             ],
             admin_url('options-general.php')
-        ));
+        );
+
+        wp_safe_redirect(wp_nonce_url($url, 'schemaweave_status'));
         exit;
     }
 }
