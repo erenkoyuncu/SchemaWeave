@@ -1,71 +1,184 @@
-# SchemaWeave
+<p align="center">
+  <img src="branding/schemaweave-hero.jpg" alt="SchemaWeave — Structured Data Engine for WordPress & PHP" width="100%">
+</p>
 
-**Schema.org JSON-LD structured data for WordPress and WooCommerce.**
+<h1 align="center">SchemaWeave</h1>
 
-SchemaWeave generates structured data from real WordPress content and administrator configuration. It is built on the independent [SchemaWeave PHP](https://github.com/erenkoyuncu/SchemaWeave-PHP) core.
+<p align="center">
+  <strong>Schema.org JSON-LD structured data for WordPress and WooCommerce.</strong><br>
+  Clean graphs, real data, practical controls — without inventing SEO signals.
+</p>
 
-## Highlights
+<p align="center">
+  <img src="https://img.shields.io/badge/WordPress-5.8%2B-21759B?style=flat-square&logo=wordpress&logoColor=white" alt="WordPress 5.8+">
+  <img src="https://img.shields.io/badge/PHP-7.4%2B-777BB4?style=flat-square&logo=php&logoColor=white" alt="PHP 7.4+">
+  <img src="https://img.shields.io/badge/WooCommerce-Optional-96588A?style=flat-square&logo=woocommerce&logoColor=white" alt="WooCommerce optional">
+  <img src="https://img.shields.io/badge/JSON--LD-Schema.org-2563EB?style=flat-square" alt="JSON-LD Schema.org">
+  <img src="https://img.shields.io/badge/License-GPLv2%2B-16A34A?style=flat-square" alt="GPLv2 or later">
+</p>
 
-- Organization, WebSite and multi-location LocalBusiness graphs.
-- WebPage variants including AboutPage, ContactPage and ProfilePage.
-- BlogPosting with the real WordPress author and publication/modification dates.
-- Product schema for WooCommerce simple and variable products.
-- Real WooCommerce Offer / AggregateOffer, SKU, availability and rating data only when available.
-- BreadcrumbList, ItemList and FAQPage.
-- Per-post/page/product schema overrides.
-- Media Library schema image selection.
-- Visitor-visible FAQ output and `[schemaweave_faq]` shortcode mode.
-- Schema Inspector, diagnostics and structural validation.
-- Settings export/import/reset and safe uninstall behavior.
-- WP-CLI inspection commands.
-- No telemetry, hosted API, tracking, or license server.
+---
 
-## Requirements
+## Why SchemaWeave?
 
-- WordPress 5.8+
-- PHP 7.4+
-- WooCommerce is optional and only required for WooCommerce Product integration.
+SchemaWeave generates structured data from **real WordPress content, WooCommerce data and administrator configuration**. It is designed to create coherent Schema.org `@graph` output while staying conservative about commercial and reputation data.
 
-## Installation
+- No fabricated prices, offers, SKU/MPN values, ratings or reviews.
+- Real WooCommerce `Offer` / `AggregateOffer` output when product data exists.
+- Real WordPress author data for `BlogPosting`.
+- Visitor-visible FAQ output so FAQ schema stays aligned with page content.
+- Per-content schema mapping and overrides.
+- Diagnostics, graph inspection and validation tools.
+- No telemetry, hosted API, tracking pixel or license server.
 
-1. Download a release ZIP or install SchemaWeave from WordPress.org when available.
-2. Activate the plugin.
-3. Open **Settings → SchemaWeave**.
-4. Configure the organization, locations, schema switches and post-type mappings.
-5. Use the SchemaWeave panel on individual pages/posts/products for content-specific overrides.
+## Supported structured data
 
-## Data integrity
-
-SchemaWeave does **not** fabricate prices, offers, identifiers, ratings, or reviews. Missing data is omitted from JSON-LD.
-
-## FAQ visibility
-
-FAQ structured data should correspond to visitor-visible content. SchemaWeave therefore renders saved FAQ content on the frontend by default. Shortcode mode emits FAQ schema only when `[schemaweave_faq]` is actually present.
+| Area | Schema types / behavior |
+| --- | --- |
+| Site | `Organization`, `WebSite` |
+| Business | `LocalBusiness`, multiple configured locations |
+| Pages | `WebPage`, `AboutPage`, `ContactPage`, `ProfilePage`, `SearchResultsPage`, `CollectionPage` |
+| Content | `BlogPosting`, real WordPress `Person` author, publication/modification dates |
+| Navigation | `BreadcrumbList`, `ItemList` |
+| FAQ | `FAQPage`, `Question`, `Answer` with visible-content safeguards |
+| WooCommerce | `Product`, `Offer`, `AggregateOffer`, SKU, availability, ratings when real data exists |
 
 ## WooCommerce
 
-Simple products use a real `Offer` when price data exists. Variable products use a real `AggregateOffer` derived from WooCommerce variation prices. Ratings are emitted only when WooCommerce has real rating data.
+SchemaWeave integrates with WooCommerce without manufacturing missing product data.
 
-## Bundled PHP core
+### Simple products
 
-The `includes/SchemaWeave/` directory is a bundled copy of the framework-independent core used so WordPress.org installations do not require Composer. The source of truth for core development is:
+When WooCommerce contains real values, SchemaWeave can emit:
 
-https://github.com/erenkoyuncu/SchemaWeave-PHP
+```text
+Product
+├── sku
+├── brand
+└── Offer
+    ├── price
+    ├── priceCurrency
+    └── availability
+```
 
-The bundled core remains MIT-licensed; the WordPress plugin is GPLv2 or later.
+### Variable products
+
+Variable products use the actual WooCommerce variation price set:
+
+```text
+Product
+└── AggregateOffer
+    ├── lowPrice
+    ├── highPrice
+    ├── offerCount
+    ├── priceCurrency
+    └── availability
+```
+
+If ratings or reviews do not exist, SchemaWeave does not invent them.
+
+## Content-level controls
+
+Pages, posts, products and supported public post types can override the global mapping through the SchemaWeave meta box.
+
+Available controls include:
+
+- Disable schema for an individual item.
+- Map content to `WebPage`, `BlogPosting` or `Product`.
+- Select `AboutPage`, `ContactPage` or `ProfilePage` subtypes.
+- Override the schema description.
+- Select a schema image from the WordPress Media Library.
+- Set a product brand.
+- Add repeating FAQ entries.
+- Preview generated JSON-LD before saving.
+
+## FAQ integrity
+
+FAQ structured data should match content users can actually see.
+
+SchemaWeave therefore renders saved FAQ entries as accessible frontend content by default. A shortcode mode is also available:
+
+```text
+[schemaweave_faq]
+```
+
+When shortcode mode is selected, FAQ schema is emitted only when the shortcode is present on the page.
+
+## Installation
+
+### WordPress ZIP
+
+1. Download the latest installable SchemaWeave ZIP.
+2. Open **Plugins → Add New Plugin → Upload Plugin**.
+3. Install and activate SchemaWeave.
+4. Open **Settings → SchemaWeave**.
+5. Configure the organization, schema switches, locations and post-type mappings.
+
+WordPress.org publication is planned for the same free/open-source plugin distribution.
+
+### Development checkout
+
+The WordPress repository uses the independent PHP engine as a git submodule:
+
+```bash
+git clone --recurse-submodules https://github.com/erenkoyuncu/SchemaWeave.git
+```
+
+## SchemaWeave ecosystem
+
+SchemaWeave is intentionally split into two repositories:
+
+| Project | Purpose | License |
+| --- | --- | --- |
+| **SchemaWeave** | WordPress & WooCommerce integration, admin UI, meta boxes, diagnostics and WP-CLI | GPLv2 or later |
+| **[SchemaWeave-PHP](https://github.com/erenkoyuncu/SchemaWeave-PHP)** | Framework-agnostic Schema.org JSON-LD engine for PHP 7.4+ | MIT |
+
+The PHP repository is the **source of truth for core development**. WordPress release ZIPs bundle the core so end users do not need Composer or git submodules.
+
+## Data integrity principle
+
+SchemaWeave follows one simple rule:
+
+> If the source application does not provide trustworthy data, SchemaWeave omits the field instead of inventing it.
+
+This is especially important for:
+
+- prices and offers,
+- SKU / identifiers,
+- product availability,
+- aggregate ratings,
+- reviews,
+- author and publication metadata.
+
+## Diagnostics & tooling
+
+SchemaWeave includes tools for inspecting the generated graph and the active WordPress environment.
+
+- Schema Inspector for selected content.
+- Structural graph validation.
+- Environment diagnostics.
+- Conservative potential-overlap warning when other SEO/schema plugins are active.
+- Settings export, import and reset.
+- WP-CLI inspection commands.
+
+## Privacy
+
+SchemaWeave does not require an external API and does not include telemetry or a license server. See [PRIVACY.md](PRIVACY.md) for the project privacy notes.
 
 ## Documentation
 
-- [`docs/WORDPRESS.md`](docs/WORDPRESS.md)
-- [`PRIVACY.md`](PRIVACY.md)
-- [`SECURITY.md`](SECURITY.md)
+- [WordPress integration guide](docs/WORDPRESS.md)
+- [PHP core relationship](docs/CORE.md)
+- [Privacy](PRIVACY.md)
+- [Security policy](SECURITY.md)
+- [Changelog](CHANGELOG.md)
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md). Issues and pull requests are welcome.
+Issues and pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
-SchemaWeave WordPress plugin: GPLv2 or later.
+SchemaWeave WordPress plugin is licensed under **GPLv2 or later**.
 
-Bundled SchemaWeave PHP core: MIT License. See `includes/SchemaWeave/LICENSE`.
+The bundled SchemaWeave PHP core remains **MIT licensed** and is developed independently in [SchemaWeave-PHP](https://github.com/erenkoyuncu/SchemaWeave-PHP).
