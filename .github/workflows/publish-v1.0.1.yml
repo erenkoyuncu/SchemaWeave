@@ -30,25 +30,17 @@ jobs:
           set -euo pipefail
           rm -rf build dist
           mkdir -p build/schemaweave/includes/SchemaWeave dist
-
-          cp schemaweave.php build/schemaweave/
-          cp uninstall.php build/schemaweave/
-          cp readme.txt build/schemaweave/
-          cp LICENSE build/schemaweave/
-          cp CHANGELOG.md build/schemaweave/
+          cp schemaweave.php uninstall.php readme.txt LICENSE CHANGELOG.md build/schemaweave/
           cp -R assets build/schemaweave/assets
           cp -R docs build/schemaweave/docs
-
           rsync -a --exclude='SchemaWeave' includes/ build/schemaweave/includes/
           cp -R includes/SchemaWeave/src/. build/schemaweave/includes/SchemaWeave/
           cp includes/SchemaWeave/LICENSE build/schemaweave/includes/SchemaWeave/LICENSE
-
           find build/schemaweave -name '*.php' -print0 | xargs -0 -n1 php -l
           grep -q 'Version: 1.0.1' build/schemaweave/schemaweave.php
           grep -q 'Stable tag: 1.0.1' build/schemaweave/readme.txt
           grep -q 'Tested up to: 7.1' build/schemaweave/readme.txt
           grep -q 'License: GPLv2 or later' build/schemaweave/schemaweave.php
-
           (cd build && zip -qr ../dist/schemaweave-1.0.1.zip schemaweave)
           unzip -t dist/schemaweave-1.0.1.zip
           (cd dist && sha256sum schemaweave-1.0.1.zip > SHA256SUMS.txt)
@@ -93,4 +85,20 @@ jobs:
               --target "$TARGET_SHA" \
               --title 'SchemaWeave v1.0.1' \
               --notes-file dist/RELEASE_NOTES.md
+          fi
+
+      - name: Verify published release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          RELEASE_URL="$(gh release view v1.0.1 --repo "$GITHUB_REPOSITORY" --json url --jq .url)"
+          printf 'SchemaWeave v1.0.1 published\n%s\n' "$RELEASE_URL" > /tmp/release-status.txt
+          CONTENT="$(base64 -w0 /tmp/release-status.txt)"
+          EXISTING_SHA="$(gh api "repos/$GITHUB_REPOSITORY/contents/.github/release-status-v1.0.1.txt" --jq .sha 2>/dev/null || true)"
+          if [ -n "$EXISTING_SHA" ]; then
+            gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/.github/release-status-v1.0.1.txt" -f message='Record SchemaWeave v1.0.1 release status' -f content="$CONTENT" -f sha="$EXISTING_SHA" >/dev/null
+          else
+            gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/.github/release-status-v1.0.1.txt" -f message='Record SchemaWeave v1.0.1 release status' -f content="$CONTENT" >/dev/null
           fi
