@@ -1,0 +1,108 @@
+name: Publish SchemaWeave v1.0.0
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/publish-v1.0.0.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+
+      - name: Build installable WordPress plugin
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf build dist
+          mkdir -p build/schemaweave/includes/SchemaWeave dist
+
+          cp schemaweave.php build/schemaweave/
+          cp uninstall.php build/schemaweave/
+          cp readme.txt build/schemaweave/
+          cp LICENSE build/schemaweave/
+          cp CHANGELOG.md build/schemaweave/
+          cp PRIVACY.md build/schemaweave/
+
+          cp -R assets build/schemaweave/assets
+          cp -R docs build/schemaweave/docs
+
+          rsync -a --exclude='SchemaWeave' includes/ build/schemaweave/includes/
+          cp -R includes/SchemaWeave/src/. build/schemaweave/includes/SchemaWeave/
+          cp includes/SchemaWeave/LICENSE build/schemaweave/includes/SchemaWeave/LICENSE
+
+          find build/schemaweave -name '*.php' -print0 | xargs -0 -n1 php -l
+          grep -q 'Version: 1.0.0' build/schemaweave/schemaweave.php
+          grep -q 'Stable tag: 1.0.0' build/schemaweave/readme.txt
+          grep -q 'License: GPLv2 or later' build/schemaweave/schemaweave.php
+
+          (cd build && zip -qr ../dist/schemaweave-1.0.0.zip schemaweave)
+          unzip -t dist/schemaweave-1.0.0.zip
+          (cd dist && sha256sum schemaweave-1.0.0.zip > SHA256SUMS.txt)
+
+      - name: Write release notes
+        shell: bash
+        run: |
+          cat > dist/RELEASE_NOTES.md <<'EOF'
+          # SchemaWeave v1.0.0
+
+          First stable public release of SchemaWeave for WordPress and WooCommerce.
+
+          ## Highlights
+          - Schema.org JSON-LD graph generation for Organization, WebSite and LocalBusiness.
+          - WebPage variants including AboutPage, ContactPage, ProfilePage and CollectionPage.
+          - BlogPosting with real WordPress author and publication/modification dates.
+          - WooCommerce Product support using real catalog data only.
+          - Simple products emit Offer when real price data exists.
+          - Variable products emit AggregateOffer from real variation price ranges.
+          - BreadcrumbList, ItemList and FAQPage support.
+          - Per-content schema overrides, custom descriptions and Media Library images.
+          - Visible FAQ safeguards and `[schemaweave_faq]` shortcode mode.
+          - Schema Inspector, diagnostics, graph validation and overlap warnings.
+          - Settings export/import/reset and WP-CLI tooling.
+          - No telemetry, hosted API, tracking or license server.
+
+          ## Requirements
+          - WordPress 5.8+
+          - PHP 7.4+
+          - WooCommerce optional
+
+          ## Data integrity
+          SchemaWeave does not fabricate prices, identifiers, ratings, reviews or offers. Missing source data is omitted from JSON-LD.
+
+          ## Install
+          Download `schemaweave-1.0.0.zip`, then use **Plugins → Add New Plugin → Upload Plugin** in WordPress.
+          EOF
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: ${{ github.event.before }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gh release view v1.0.0 >/dev/null 2>&1; then
+            echo 'Release v1.0.0 already exists.'
+            exit 0
+          fi
+          gh release create v1.0.0 \
+            dist/schemaweave-1.0.0.zip \
+            dist/SHA256SUMS.txt \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$TARGET_SHA" \
+            --title 'SchemaWeave v1.0.0' \
+            --notes-file dist/RELEASE_NOTES.md
