@@ -1,0 +1,78 @@
+name: Fix final Plugin Check warning
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/fix-final-plugin-check.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Patch notice nonce flow
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 <<'PY'
+          from pathlib import Path
+          p = Path('includes/class-tools.php')
+          text = p.read_text()
+
+          old = """        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only status code used only to choose an admin notice.
+          $status = isset($_GET['schemaweave_status'])
+              ? sanitize_key((string) wp_unslash($_GET['schemaweave_status']))
+              : '';
+          """.replace('\n          ', '\n').lstrip()
+          new = """        if (!isset($_GET['schemaweave_status'])) {
+              return;
+          }
+
+          check_admin_referer('schemaweave_status');
+          $status = sanitize_key((string) wp_unslash($_GET['schemaweave_status']));
+          """.replace('\n          ', '\n').lstrip()
+          if old not in text:
+              raise SystemExit('notice block not found')
+          text = text.replace(old, new, 1)
+
+          old = """        wp_safe_redirect(add_query_arg(
+              [
+                  'page' => SchemaWeave_WordPress_Settings::PAGE_SLUG,
+                  'schemaweave_status' => $status,
+              ],
+              admin_url('options-general.php')
+          ));
+          """.replace('\n          ', '\n').lstrip()
+          new = """        $url = add_query_arg(
+              [
+                  'page' => SchemaWeave_WordPress_Settings::PAGE_SLUG,
+                  'schemaweave_status' => $status,
+              ],
+              admin_url('options-general.php')
+          );
+
+          wp_safe_redirect(wp_nonce_url($url, 'schemaweave_status'));
+          """.replace('\n          ', '\n').lstrip()
+          if old not in text:
+              raise SystemExit('redirect block not found')
+          p.write_text(text.replace(old, new, 1))
+          PY
+
+          php -l includes/class-tools.php
+
+      - name: Commit fix
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add includes/class-tools.php
+          git commit -m 'Fix SchemaWeave admin notice nonce flow'
+          git push origin HEAD:main
